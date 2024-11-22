@@ -7,9 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class HelloApplication {
 
-	@Autowired
-	private HelloService helloService;
-
 	public static void main(String[] args) {
 		SpringApplication.run(HelloApplication.class, args);
 	}
