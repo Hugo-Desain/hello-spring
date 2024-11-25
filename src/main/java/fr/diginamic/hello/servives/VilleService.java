@@ -1,36 +1,48 @@
 package fr.diginamic.hello.servives;
 import fr.diginamic.hello.models.Ville;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class VilleService {
-    public Ville ville;
 
-    List<Ville> villes = new ArrayList<>();
+    private List<Ville> villes = new ArrayList<>();
+
+    public VilleService() {
+        villes.add(new Ville(1, "Paris", 2200000));
+        villes.add(new Ville(2, "Lyon", 500000));
+        villes.add(new Ville(3, "Marseille", 850000));
+    }
 
     public List<Ville> getAllVilles() {
-        villes.add(new Ville("Paris", 1000000));
-        villes.add(new Ville("Lyon", 500000));
-        villes.add(new Ville("Marseille", 800000));
-        villes.add(new Ville("Bordeaux", 250000));
-        villes.add(new Ville("Lille", 300000));
-        villes.add(new Ville("Toulouse", 450000));
-
         return villes;
     }
 
-    public boolean addVille(Ville nouvelleVille) {
-        if (villes.stream().anyMatch(ville -> ville.getNom().equalsIgnoreCase(nouvelleVille.getNom()))) {
-            return false;
-        }
-        villes.add(nouvelleVille);
-        return true;
+    public ResponseEntity<Ville> getVilleById(@PathVariable int id) {
+        return villes.stream()
+                .filter(v -> v.getId() == id)
+                .findFirst()
+                .map(ville -> ResponseEntity.ok(ville))
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
-    public boolean updateVille(int id, Ville updatedVille) {
+    public ResponseEntity<String> addVille(@Valid @RequestBody Ville nouvelleVille) {
+
+        if (villes.stream().anyMatch(ville -> ville.getNom().equalsIgnoreCase(nouvelleVille.getNom()))) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La ville existe déjà");
+        }
+        villes.add(nouvelleVille);
+        return ResponseEntity.status(HttpStatus.OK).body("Ville insérée avec succès");
+
+    }
+
+    public ResponseEntity<String> updateVille(@PathVariable int id, @Valid @RequestBody Ville updatedVille) {
         Ville villeToUpdate = villes.stream()
                 .filter(ville -> ville.getId() == id)
                 .findFirst()
@@ -39,9 +51,19 @@ public class VilleService {
         if (villeToUpdate != null) {
             villeToUpdate.setNom(updatedVille.getNom());
             villeToUpdate.setNbHabitants(updatedVille.getNbHabitants());
-            return true;
+            return ResponseEntity.status(HttpStatus.OK).body("Ville mise à jour avec succès");
         }
-        return false;
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ville avec l'id " + id + " non trouvée");
+
+    }
+
+    public ResponseEntity<String> deleteVille(@PathVariable int id) {
+        boolean removed = villes.removeIf(v -> v.getId() == id);
+        if (removed) {
+            return ResponseEntity.ok("Ville supprimée avec succès.");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ville introuvable.");
+        }
     }
 
 }
