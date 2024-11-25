@@ -1,24 +1,27 @@
 package fr.diginamic.hello.models;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.persistence.*;
 
+@Entity
 public class Ville {
 
-    @Min(1)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @NotNull
-    @Size(min = 2)
     private String nom;
 
-    @Min(1)
     private int nbHabitants;
 
+    @ManyToOne
+    @JoinColumn(name = "departement_id")
+    private Departement departement;
 
-    public Ville(int id, String nom, int nbHabitants) {
-        this.id = id;
+    public Ville() {
+
+    }
+
+    public Ville(String nom, int nbHabitants, Departement departement) {
         this.nom = nom;
         this.nbHabitants = nbHabitants;
     }
