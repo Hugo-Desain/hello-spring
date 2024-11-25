@@ -23,6 +23,11 @@ public class Ville {
         this.nbHabitants = nbHabitants;
     }
 
+    public Ville(int id, String nom, int nbHabitants) {
+        this.nom = nom;
+        this.nbHabitants = nbHabitants;
+    }
+
     /**
      * Getter
      * @return nom
