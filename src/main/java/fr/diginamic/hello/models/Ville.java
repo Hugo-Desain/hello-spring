@@ -11,6 +11,11 @@ public class Ville {
         this.nbHabitants = nbHabitants;
     }
 
+    public Ville(int id, String nom, int nbHabitants) {
+        this.nom = nom;
+        this.nbHabitants = nbHabitants;
+    }
+
     /**
      * Getter
      * @return nom
@@ -41,5 +46,9 @@ public class Ville {
      */
     public void setNbHabitants(int nbHabitants) {
         this.nbHabitants = nbHabitants;
+    }
+
+    public int getId() {
+        return id;
     }
 }

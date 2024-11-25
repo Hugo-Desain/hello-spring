@@ -1,40 +1,46 @@
 package fr.diginamic.hello.controleurs;
 
 import fr.diginamic.hello.models.Ville;
+import fr.diginamic.hello.servives.VilleService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/villes")
-
 public class VilleControleur {
-
-    List<Ville> villes = new ArrayList<>();
-
-    public VilleControleur() {
-        villes.add(new Ville("Paris", 2161000));
-        villes.add(new Ville("Marseille", 861635));
-        villes.add(new Ville("Lyon", 513275));
-        villes.add(new Ville("Toulouse", 493465));
-        villes.add(new Ville("Nice", 343895));
-    }
+    @Autowired
+    private VilleService villeService;
 
     @GetMapping
-    public List<Ville> getVilles() {
-        return villes;
+    public List<Ville> getAllCities() {
+        return villeService.getAllVilles();
     }
 
     @PostMapping
-    public ResponseEntity<String> addVille(@RequestBody Ville nouvelleVille){
+    public ResponseEntity<String> addCity(@Valid @RequestBody Ville newVille) {
+        boolean isAdded = villeService.addVille(newVille);
 
-        if (villes.stream().anyMatch(ville -> ville.getNom().equals(nouvelleVille.getNom()))){
-            return ResponseEntity.badRequest().body("La ville existe déjà");
+        if (isAdded) {
+            return ResponseEntity.status(HttpStatus.OK).body("Ville insérée avec succès");
         } else {
-            villes.add(nouvelleVille);
-            return ResponseEntity.ok("Ville insérée avec succès");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La ville existe déjà");
         }
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<String> updateCity(@PathVariable int id, @Valid @RequestBody Ville updatedVille) {
+        boolean isUpdated = villeService.updateVille(id, updatedVille);
+
+        if (isUpdated) {
+            return ResponseEntity.status(HttpStatus.OK).body("Ville mise à jour avec succès");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ville avec l'id " + id + " non trouvée");
+        }
+    }
+
 }
