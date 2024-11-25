@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Size;
 
 public class Ville {
 
-    @NotNull
     @Min(1)
     private int id;
 
@@ -14,16 +13,12 @@ public class Ville {
     @Size(min = 2)
     private String nom;
 
-    @NotNull
     @Min(1)
     private int nbHabitants;
 
-    public Ville(String nom, int nbHabitants) {
-        this.nom = nom;
-        this.nbHabitants = nbHabitants;
-    }
 
     public Ville(int id, String nom, int nbHabitants) {
+        this.id = id;
         this.nom = nom;
         this.nbHabitants = nbHabitants;
     }
