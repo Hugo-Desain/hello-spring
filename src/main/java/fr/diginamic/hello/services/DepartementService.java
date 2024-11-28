@@ -1,9 +1,12 @@
 package fr.diginamic.hello.services;
 
+import fr.diginamic.hello.dtos.DepartementDto;
+import fr.diginamic.hello.exceptions.FunctionalException;
+import fr.diginamic.hello.mappers.DepartementMapper;
 import fr.diginamic.hello.models.Departement;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import fr.diginamic.hello.repositories.DepartementRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,28 +14,39 @@ import java.util.List;
 @Service
 public class DepartementService {
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    @Autowired
+    private DepartementRepository departementRepository;
 
-    public List<Departement> getAllDepartements() {
-        return entityManager.createQuery("SELECT d FROM Departement d", Departement.class).getResultList();
+    public List<DepartementDto> getAllDepartements() {
+        return departementRepository.findAll()
+                .stream()
+                .map(DepartementMapper::toDto)
+                .toList();
+    }
+    public DepartementDto getDepartementById(int id) {
+        Departement departement = departementRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Département introuvable"));
+        return DepartementMapper.toDto(departement);
     }
 
-    public Departement getDepartementById(int id) {
-        return entityManager.find(Departement.class, id);
+    public DepartementDto addDepartement(DepartementDto departementDto) {
+        Departement departement = DepartementMapper.toEntity(departementDto);
+        Departement savedDepartement = departementRepository.save(departement);
+        return DepartementMapper.toDto(savedDepartement);
     }
 
-    @Transactional
-    public Departement addDepartement(Departement departement) {
-        entityManager.persist(departement);
-        return departement;
-    }
-
-    @Transactional
     public void deleteDepartement(int id) {
-        Departement departement = getDepartementById(id);
-        if (departement != null) {
-            entityManager.remove(departement);
+        Departement departement = departementRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Département introuvable"));
+        departementRepository.delete(departement);
+    }
+
+    private void validateDepartement(DepartementDto departementDto) throws FunctionalException {
+        if (departementDto.getCodeDepartement() == null || departementDto.getCodeDepartement().length() < 2 || departementDto.getCodeDepartement().length() > 3) {
+            throw new FunctionalException("Le code du département doit contenir entre 2 et 3 caractères.");
+        }
+        if (departementDto.getNomDepartement() == null || departementDto.getNomDepartement().length() < 3) {
+            throw new FunctionalException("Le nom du département est obligatoire et doit contenir au moins 3 lettres.");
         }
     }
 }
