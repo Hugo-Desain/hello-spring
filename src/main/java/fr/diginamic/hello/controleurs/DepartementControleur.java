@@ -79,7 +79,8 @@ public class DepartementControleur {
             document.open();
 
             String nomDepartement = departementService.getNomDepartementApi(codeDepartement);
-
+            document.addTitle("Fiche Département");
+            document.newPage();
             document.add(new Paragraph("Département : " + nomDepartement));
             document.add(new Paragraph("Code Département : " + codeDepartement));
             document.add(new Paragraph("\n"));
@@ -93,14 +94,13 @@ public class DepartementControleur {
                 table.addCell(ville.getNomVille());
                 table.addCell(String.valueOf(ville.getNbHabitants()));
             }
-
             document.add(table);
+
             document.close();
             response.flushBuffer();
 
         } catch (Exception e) {
             throw new RuntimeException("Erreur lors de l'exportation PDF", e);
-
         }
     }
 }
