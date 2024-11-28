@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
@@ -66,6 +67,25 @@ public class VilleService {
                 .toList();
     }
 
+    public List<VilleDto> getVillesByDepartementCode(String codeDepartement) throws FunctionalException {
+        // Vérifie que le code département est valide
+        if (codeDepartement == null || codeDepartement.length() != 2) {
+            throw new FunctionalException("Le code département doit contenir exactement 2 caractères.");
+        }
+
+        // Récupère les villes à partir du repository
+        List<Ville> villes = villeRepository.findByDepartementCode(codeDepartement);
+
+        // Si aucune ville n'est trouvée, lève une exception
+        if (villes.isEmpty()) {
+            throw new FunctionalException("Aucune ville trouvée pour le département avec le code : " + codeDepartement);
+        }
+
+        // Mappe les entités Ville en DTOs VilleDto
+        return villes.stream().map(VilleMapper::toDto).toList();
+    }
+
+
     public List<VilleDto> getTopVillesByDepartement(int departementId, int n) {
         return villeRepository.findTopByDepartementOrderByPopulation(departementId, PageRequest.of(0, n))
                 .stream()
@@ -99,7 +119,7 @@ public class VilleService {
         existingVille.setNom(villeDto.getNomVille());
         existingVille.setNbHabitants(villeDto.getNbHabitants());
         existingVille.getDepartement().setCode(villeDto.getCodeDepartement());
-        existingVille.getDepartement().setNom(villeDto.getNomDepartement());
+        existingVille.getDepartement().setNom(villeDto.getNomDepartementApi(villeDto.getCodeDepartement()));
         Ville updatedVille = villeRepository.save(existingVille);
         return VilleMapper.toDto(updatedVille);
     }

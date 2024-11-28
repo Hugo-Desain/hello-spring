@@ -8,6 +8,7 @@ import fr.diginamic.hello.repositories.DepartementRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
@@ -41,12 +42,27 @@ public class DepartementService {
         departementRepository.delete(departement);
     }
 
-    private void validateDepartement(DepartementDto departementDto) throws FunctionalException {
-        if (departementDto.getCodeDepartement() == null || departementDto.getCodeDepartement().length() < 2 || departementDto.getCodeDepartement().length() > 3) {
-            throw new FunctionalException("Le code du département doit contenir entre 2 et 3 caractères.");
-        }
-        if (departementDto.getNomDepartement() == null || departementDto.getNomDepartement().length() < 3) {
-            throw new FunctionalException("Le nom du département est obligatoire et doit contenir au moins 3 lettres.");
+    public String getNomDepartementApi(String codeDepartement) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            String apiUrl = "https://geo.api.gouv.fr/departements/" + codeDepartement + "?fields=nom,code,codeRegion";
+            var response = restTemplate.getForObject(apiUrl, ApiResponse.class);
+            return response != null ? response.getNom() : "Nom inconnu";
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur lors de la récupération du nom du département via l'API", e);
         }
     }
+
+    private static class ApiResponse {
+        private String nom;
+
+        public String getNom() {
+            return nom;
+        }
+
+        public void setNom(String nom) {
+            this.nom = nom;
+        }
+    }
+
 }
