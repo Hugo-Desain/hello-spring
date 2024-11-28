@@ -100,30 +100,4 @@ public class VilleControleur {
             throw new RuntimeException("Erreur lors de l'exportation CSV", e);
         }
     }
-
-//    @GetMapping("/export-csv")
-//    public void exportVillesToCsv(@RequestParam int minPopulation, HttpServletResponse response) {
-//        try {
-//            response.setContentType("text/csv");
-//            response.setHeader("Content-Disposition", "attachment;filename=villes.csv");
-//
-//            PrintWriter writer = response.getWriter();
-//            writer.println("Nom de la Ville,Nombre d'Habitants,Code Département,Nom Département");
-//
-//            List<VilleDto> villes = villeService.getVillesByPopulation(minPopulation, null);
-//
-//            for (VilleDto ville : villes) {
-//                writer.printf("%s,%d,%s,%s%n",
-//                        ville.getNomVille(),
-//                        ville.getNbHabitants(),
-//                        ville.getCodeDepartement(),
-//                        ville.getNomDepartementApi(ville.getCodeDepartement()));
-//            }
-//
-//            writer.flush();
-//            writer.close();
-//        } catch (Exception e) {
-//            throw new RuntimeException("Erreur lors de l'exportation CSV", e);
-//        }
-//    }
 }
