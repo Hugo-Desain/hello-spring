@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "ville")
+@Table(name = "ville", uniqueConstraints = @UniqueConstraint(columnNames = {"nom", "id_dept"}))
 public class Ville {
 
     @Id
