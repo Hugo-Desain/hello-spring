@@ -8,6 +8,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 import fr.diginamic.hello.dtos.DepartementDto;
 import fr.diginamic.hello.dtos.VilleDto;
 import fr.diginamic.hello.exceptions.FunctionalException;
+import fr.diginamic.hello.models.Ville;
 import fr.diginamic.hello.services.DepartementService;
 import fr.diginamic.hello.services.VilleService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -58,9 +59,9 @@ public class DepartementControleur {
     }
 
     @GetMapping("/{codeDepartement}/villes")
-    public ResponseEntity<List<VilleDto>> getVillesByDepartement(@PathVariable String codeDepartement) {
+    public ResponseEntity<List<Ville>> getVillesByDepartement(@PathVariable String codeDepartement) {
         try {
-            List<VilleDto> villes = villeService.getVillesByDepartementCode(codeDepartement);
+            List<Ville> villes = villeService.getVillesByDepartementCode(codeDepartement);
             return ResponseEntity.ok(villes);
         } catch (FunctionalException e) {
             return ResponseEntity.badRequest().body(null);
@@ -84,14 +85,14 @@ public class DepartementControleur {
             document.add(new Paragraph("Département : " + nomDepartement));
             document.add(new Paragraph("Code Département : " + codeDepartement));
             document.add(new Paragraph("\n"));
-            List<VilleDto> villes = villeService.getVillesByDepartementCode(codeDepartement);
+            List<Ville> villes = villeService.getVillesByDepartementCode(codeDepartement);
 
             PdfPTable table = new PdfPTable(2);
             table.addCell("Nom de la Ville");
             table.addCell("Population");
 
-            for (VilleDto ville : villes) {
-                table.addCell(ville.getNomVille());
+            for (Ville ville : villes) {
+                table.addCell(ville.getNom());
                 table.addCell(String.valueOf(ville.getNbHabitants()));
             }
             document.add(table);

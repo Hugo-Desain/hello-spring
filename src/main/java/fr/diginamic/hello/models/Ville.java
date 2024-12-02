@@ -33,6 +33,9 @@ public class Ville {
         this.departement = departement;
     }
 
+    public Ville(String nomVille, int nbHabitants) {
+    }
+
     /**
      * Getter
      *
